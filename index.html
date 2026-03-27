@@ -3,626 +3,465 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paul — PPS GWP Budget Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Paul — Budget Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0e14;
-    --surface: #13171f;
-    --surface2: #1a1f2b;
-    --border: #232838;
-    --accent: #00e5c0;
-    --accent2: #ff5f6b;
-    --accent3: #f5c842;
-    --text: #e8ecf4;
-    --muted: #6b7591;
-    --dim: #3a4155;
-    --green: #2ecc9a;
-    --red: #ff5f6b;
-    --blue: #4a9eff;
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.13);
+    --accent-blue: #0071e3;
+    --text: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --green: #34c759;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
+    --r: 16px;
+    --r-sm: 10px;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
   body {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 2rem;
-    overflow-x: hidden;
+    padding: 2.5rem 2rem;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    top: -200px; left: -200px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(0,229,192,0.04) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .grid-bg {
-    position: fixed; inset: 0;
-    background-image: 
-      linear-gradient(rgba(35,40,56,0.4) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(35,40,56,0.4) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .wrapper {
-    max-width: 1100px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
+  .wrapper { max-width: 1080px; margin: 0 auto; }
 
   /* HEADER */
   header {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
   }
 
   .header-left h1 {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800;
+    font-size: 1.65rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .header-left p {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    font-weight: 400;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.4rem 0.9rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 2.5s infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+  .status-pill span {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  /* INPUT BAR */
+  .input-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.2rem 1.75rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 2rem;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .input-group { display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .input-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .days-row { display: flex; align-items: center; gap: 0.6rem; }
+
+  .days-row input {
+    width: 88px;
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding: 0.45rem 0.7rem;
+    text-align: center;
+    outline: none;
+    letter-spacing: -0.02em;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .days-row input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.14);
+    background: #fff;
+  }
+
+  .unit { font-size: 0.78rem; color: var(--text-secondary); font-weight: 400; }
+
+  .month-select {
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.52rem 0.85rem;
+    outline: none;
+    cursor: pointer;
+    min-width: 170px;
+    transition: border-color 0.15s;
+  }
+
+  .month-select:focus { border-color: var(--accent-blue); }
+
+  .hint {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+  }
+
+  .save-btn {
+    background: var(--accent-blue);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 0.62rem 1.6rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    letter-spacing: -0.01em;
+  }
+
+  .save-btn:hover { background: #0077ed; box-shadow: 0 4px 12px rgba(0,113,227,0.28); }
+  .save-btn:active { transform: scale(0.97); }
+
+  /* KPI ROW */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1.35rem 1.4rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s;
+  }
+
+  .kpi:hover { box-shadow: var(--shadow-md); }
+
+  .kpi-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.65rem;
+  }
+
+  .kpi-value {
+    font-size: 1.55rem;
+    font-weight: 600;
     letter-spacing: -0.03em;
     line-height: 1;
     color: var(--text);
   }
 
-  .header-left h1 span {
-    color: var(--accent);
-  }
-
-  .header-left p {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 0.5rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .header-right {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    text-align: right;
-    letter-spacing: 0.05em;
-  }
-
-  .header-right .live-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    margin-right: 6px;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-  }
-
-  /* INPUT SECTION */
-  .input-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .input-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    display: block;
-    margin-bottom: 0.5rem;
-  }
-
-  .input-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .days-input {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .days-input input {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--accent);
-    font-family: 'DM Mono', monospace;
-    font-size: 1.4rem;
-    font-weight: 500;
-    width: 100px;
-    padding: 0.5rem 0.75rem;
-    outline: none;
-    transition: border-color 0.2s;
-    text-align: center;
-  }
-
-  .days-input input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0,229,192,0.1);
-  }
-
-  .days-input .unit {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-
-  .month-select-group {
-    display: flex;
-    flex-direction: column;
-    min-width: 180px;
-  }
-
-  .month-select {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    padding: 0.6rem 0.75rem;
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-
-  .month-select:focus {
-    border-color: var(--accent);
-  }
-
-  .input-info {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 0.3rem;
-  }
-
-  .update-btn {
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    border-radius: 8px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.8rem;
-    letter-spacing: 0.05em;
-    padding: 0.7rem 1.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    align-self: flex-end;
-  }
-
-  .update-btn:hover {
-    background: #00ffda;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(0,229,192,0.3);
-  }
-
-  /* KPI CARDS ROW */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.2rem 1.4rem;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--accent-line, var(--accent));
-    border-radius: 2px 2px 0 0;
-  }
-
-  .kpi-card.red { --accent-line: var(--red); }
-  .kpi-card.yellow { --accent-line: var(--accent3); }
-  .kpi-card.blue { --accent-line: var(--blue); }
-
-  .kpi-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.6rem;
-  }
-
-  .kpi-value {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1;
-  }
-
   .kpi-sub {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--muted);
-    margin-top: 0.4rem;
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    margin-top: 0.35rem;
+    font-weight: 400;
   }
 
-  .kpi-badge {
-    position: absolute;
-    top: 1rem; right: 1rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 500;
-  }
-
-  .badge-green { background: rgba(46,204,154,0.15); color: var(--green); }
-  .badge-red { background: rgba(255,95,107,0.15); color: var(--red); }
-  .badge-yellow { background: rgba(245,200,66,0.15); color: var(--accent3); }
-
-  /* CHARTS ROW */
+  /* CHARTS */
   .charts-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
   }
 
-  .chart-card {
+  .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--r);
     padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
   }
 
-  .chart-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+  .card-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
     text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 1.2rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.4rem;
   }
 
-  /* DONUT CHART */
-  .donut-wrap {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
+  /* DONUT */
+  .donut-wrap { display: flex; align-items: center; gap: 1.75rem; }
 
-  .donut-svg-wrap {
-    position: relative;
-    flex-shrink: 0;
-  }
+  .donut-svg-wrap { position: relative; flex-shrink: 0; }
 
   .donut-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
   }
 
   .donut-pct {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--text);
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
     line-height: 1;
   }
 
-  .donut-pct-label {
-    font-family: 'DM Mono', monospace;
+  .donut-sub {
     font-size: 0.6rem;
-    color: var(--muted);
+    color: var(--text-tertiary);
     margin-top: 2px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
   }
 
-  .donut-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    flex: 1;
+  .legend { display: flex; flex-direction: column; gap: 0.9rem; flex: 1; }
+
+  .legend-row { display: flex; align-items: center; gap: 0.6rem; }
+
+  .ldot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .ltext .ll {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    display: block;
+    font-weight: 400;
   }
 
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+  .ltext .lv {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    display: block;
   }
 
-  .legend-dot {
-    width: 8px; height: 8px;
-    border-radius: 2px;
+  /* BARS */
+  .bars { display: flex; flex-direction: column; gap: 0.65rem; }
+
+  .bar-row { display: flex; align-items: center; gap: 0.7rem; }
+
+  .bm {
+    font-size: 0.63rem;
+    color: var(--text-tertiary);
+    width: 26px;
     flex-shrink: 0;
-  }
-
-  .legend-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-  }
-
-  .legend-label { color: var(--muted); display: block; }
-  .legend-val { color: var(--text); font-weight: 500; }
-
-  /* BAR CHART */
-  .bar-chart {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .bar-row {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-  }
-
-  .bar-month {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
-    width: 28px;
-    flex-shrink: 0;
+    font-weight: 500;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
-  .bar-track {
+  .btrack {
     flex: 1;
-    height: 20px;
-    background: var(--surface2);
-    border-radius: 4px;
+    height: 5px;
+    background: var(--bg);
+    border-radius: 100px;
     overflow: hidden;
-    position: relative;
   }
 
-  .bar-fill {
+  .bfill {
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
+    border-radius: 100px;
+    transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
   }
 
-  .bar-fill.planned {
-    background: linear-gradient(90deg, var(--dim), var(--dim));
-    opacity: 0.6;
-  }
+  .bfill.done { background: var(--text); }
+  .bfill.active { background: var(--accent-blue); }
+  .bfill.future { background: #d1d1d6; }
 
-  .bar-fill.actual {
-    background: linear-gradient(90deg, var(--accent), rgba(0,229,192,0.7));
-  }
-
-  .bar-fill.future {
-    background: linear-gradient(90deg, var(--blue), rgba(74,158,255,0.5));
-    opacity: 0.4;
-  }
-
-  .bar-val {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
-    width: 40px;
+  .bval {
+    font-size: 0.67rem;
+    color: var(--text-tertiary);
+    width: 30px;
     text-align: right;
     flex-shrink: 0;
+    font-weight: 500;
   }
 
-  /* REVENUE CHART */
-  .rev-chart-wrap {
-    overflow: hidden;
-  }
+  .bval.cur { color: var(--accent-blue); font-weight: 600; }
 
   /* BOTTOM ROW */
   .bottom-row {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
   }
 
-  /* BUDGET BREAKDOWN TABLE */
-  .breakdown-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+  /* TABLE */
+  .tbl { width: 100%; border-collapse: collapse; }
 
-  .breakdown-table th {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
+  .tbl th {
+    font-size: 0.63rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     text-align: left;
-    padding: 0 0 0.8rem 0;
+    padding: 0 0 0.85rem;
     border-bottom: 1px solid var(--border);
   }
 
-  .breakdown-table th:not(:first-child) { text-align: right; }
+  .tbl th:not(:first-child) { text-align: right; }
 
-  .breakdown-table td {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
+  .tbl td {
+    font-size: 0.79rem;
     color: var(--text);
     padding: 0.6rem 0;
-    border-bottom: 1px solid rgba(35,40,56,0.6);
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
   }
 
-  .breakdown-table td:not(:first-child) { text-align: right; }
-  
-  .breakdown-table .month-name { color: var(--muted); font-size: 0.65rem; }
+  .tbl td:not(:first-child) { text-align: right; }
+  .tbl td.mname { color: var(--text-secondary); font-size: 0.77rem; }
 
-  .breakdown-table .total-row td {
-    border-top: 1px solid var(--border);
+  .tbl .trow td {
     border-bottom: none;
-    color: var(--accent);
-    font-weight: 500;
-    padding-top: 0.8rem;
+    border-top: 1px solid var(--border-strong);
+    font-weight: 600;
+    padding-top: 0.75rem;
   }
 
-  .status-pill {
-    display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.6rem;
-  }
-
-  .status-done { background: rgba(0,229,192,0.12); color: var(--accent); }
-  .status-planned { background: rgba(74,158,255,0.12); color: var(--blue); }
-  .status-current { background: rgba(245,200,66,0.15); color: var(--accent3); }
-
-  /* BURN RATE */
-  .burnrate-card {
+  /* METRICS */
+  .metrics {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--r);
     padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+    box-shadow: var(--shadow-sm);
   }
 
-  .burnrate-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+  .metric-item {
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
   }
 
-  .burnrate-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
+  .metric-item:first-child { padding-top: 0; }
+  .metric-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .mlabel {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.2rem;
   }
 
-  .burnrate-value {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.1rem;
-    font-weight: 500;
+  .mval {
+    font-size: 1.05rem;
+    font-weight: 600;
     color: var(--text);
+    letter-spacing: -0.02em;
   }
 
-  .burnrate-sub {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* RADIAL GAUGE */
-  .gauge-wrap {
-    position: relative;
-    width: 120px;
-    margin: 0 auto;
+  .msub {
+    font-size: 0.67rem;
+    color: var(--text-tertiary);
+    margin-top: 0.12rem;
   }
 
   /* FOOTER */
   footer {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--dim);
+    margin-top: 1.5rem;
+    font-size: 0.67rem;
+    color: var(--text-tertiary);
   }
 
-  /* ANIMATION */
-  .fade-in {
-    animation: fadeIn 0.4s ease both;
-  }
+  /* ANIM */
+  .fu { animation: fu 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  @keyframes fu { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+  .d0{animation-delay:0s} .d1{animation-delay:.07s} .d2{animation-delay:.14s}
+  .d3{animation-delay:.21s} .d4{animation-delay:.28s}
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .stagger-1 { animation-delay: 0.05s; }
-  .stagger-2 { animation-delay: 0.1s; }
-  .stagger-3 { animation-delay: 0.15s; }
-  .stagger-4 { animation-delay: 0.2s; }
-  .stagger-5 { animation-delay: 0.25s; }
-  .stagger-6 { animation-delay: 0.3s; }
-
-  @media (max-width: 768px) {
-    body { padding: 1rem; }
-    .kpi-row { grid-template-columns: 1fr 1fr; }
-    .charts-row, .bottom-row { grid-template-columns: 1fr; }
+  @media(max-width:768px){
+    body{padding:1.25rem 1rem}
+    .kpi-row{grid-template-columns:1fr 1fr}
+    .charts-row,.bottom-row{grid-template-columns:1fr}
+    header{flex-direction:column;align-items:flex-start;gap:.75rem}
   }
 </style>
 </head>
 <body>
-<div class="grid-bg"></div>
 <div class="wrapper">
 
-  <!-- HEADER -->
-  <header class="fade-in">
+  <header class="fu d0">
     <div class="header-left">
-      <h1>Paul<span>.</span></h1>
-      <p>PPS GWP · Siemens Energy · FY 2026</p>
+      <h1>Budget Overview</h1>
+      <p>Paul · PPS GWP · Siemens Energy · FY 2026</p>
     </div>
-    <div class="header-right">
-      <span class="live-dot"></span>BUDGET TRACKER<br>
-      Rate: €235/hr (Apr–Sep) · €235.125/hr (Jan–Mar)
+    <div class="status-pill">
+      <div class="live-dot"></div>
+      <span id="statusText">Loading…</span>
     </div>
   </header>
 
-  <!-- INPUT -->
-  <div class="input-section fade-in stagger-1">
+  <div class="input-bar fu d1">
     <div class="input-group">
-      <label class="input-label">Days worked this month</label>
-      <div class="days-input">
+      <label class="input-label">Days worked</label>
+      <div class="days-row">
         <input type="number" id="daysInput" min="0" max="23" step="0.5" value="0" />
-        <span class="unit">days × 8h</span>
+        <span class="unit">days · 8 hrs</span>
       </div>
-      <span class="input-info" id="hoursCalc">= 0 hours</span>
+      <span class="hint" id="hoursCalc">= 0 hours</span>
     </div>
 
-    <div class="month-select-group">
-      <label class="input-label">Current month</label>
+    <div class="input-group">
+      <label class="input-label">Month</label>
       <select class="month-select" id="monthSelect">
         <option value="0">January 2026</option>
         <option value="1">February 2026</option>
@@ -634,359 +473,302 @@
         <option value="7">August 2026</option>
         <option value="8">September 2026</option>
       </select>
-      <span class="input-info" id="monthBudgetInfo">Budget: 20.75 days planned</span>
+      <span class="hint" id="monthInfo">20.75 days planned</span>
     </div>
 
-    <button class="update-btn" onclick="updateDashboard()">Update →</button>
+    <button class="save-btn" onclick="save()">Save</button>
   </div>
 
-  <!-- KPI CARDS -->
-  <div class="kpi-row fade-in stagger-2">
-    <div class="kpi-card">
-      <div class="kpi-label">My Allocated Budget</div>
-      <div class="kpi-value" id="kpi-budget">€146,350</div>
-      <div class="kpi-sub" id="kpi-budget-days">106 days planned</div>
+  <div class="kpi-row fu d2">
+    <div class="kpi">
+      <div class="kpi-label">My Budget</div>
+      <div class="kpi-value" id="kpi-budget">—</div>
+      <div class="kpi-sub" id="kpi-budget-sub">—</div>
     </div>
-    <div class="kpi-card yellow">
-      <div class="kpi-label">Paul's Revenue (YTD)</div>
-      <div class="kpi-value" id="kpi-ytd">€0</div>
-      <div class="kpi-sub" id="kpi-ytd-days">0 days logged</div>
+    <div class="kpi">
+      <div class="kpi-label">Revenue YTD</div>
+      <div class="kpi-value" id="kpi-ytd">—</div>
+      <div class="kpi-sub" id="kpi-ytd-sub">—</div>
     </div>
-    <div class="kpi-card red">
-      <div class="kpi-label">Remaining Budget</div>
-      <div class="kpi-value" id="kpi-remaining">€381,744</div>
-      <div class="kpi-sub" id="kpi-remaining-pct">100% left</div>
+    <div class="kpi">
+      <div class="kpi-label">Remaining</div>
+      <div class="kpi-value" id="kpi-rem">—</div>
+      <div class="kpi-sub" id="kpi-rem-sub">—</div>
     </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">Days This Month</div>
-      <div class="kpi-value" id="kpi-month-days">0 / 0</div>
-      <div class="kpi-sub" id="kpi-month-rev">€0 revenue</div>
+    <div class="kpi">
+      <div class="kpi-label">This Month</div>
+      <div class="kpi-value" id="kpi-month">—</div>
+      <div class="kpi-sub" id="kpi-month-sub">—</div>
     </div>
   </div>
 
-  <!-- CHARTS ROW -->
-  <div class="charts-row fade-in stagger-3">
-
-    <!-- DONUT -->
-    <div class="chart-card">
-      <div class="chart-title">Budget Utilisation</div>
+  <div class="charts-row fu d3">
+    <div class="card">
+      <div class="card-label">Budget Utilisation</div>
       <div class="donut-wrap">
         <div class="donut-svg-wrap">
-          <svg id="donutSvg" width="150" height="150" viewBox="0 0 150 150">
-            <!-- background track -->
-            <circle cx="75" cy="75" r="56" fill="none" stroke="#232838" stroke-width="20"/>
-            <!-- used arc (teal) -->
-            <circle id="donutUsed" cx="75" cy="75" r="56" fill="none" stroke="#00e5c0" stroke-width="20"
-              stroke-dasharray="0 352" stroke-dashoffset="0" stroke-linecap="butt"
-              transform="rotate(-90 75 75)"
-              style="transition: stroke-dasharray 0.9s cubic-bezier(0.16,1,0.3,1)"/>
+          <svg width="136" height="136" viewBox="0 0 136 136">
+            <circle cx="68" cy="68" r="50" fill="none" stroke="#f0f0f0" stroke-width="13"/>
+            <circle id="donutArc" cx="68" cy="68" r="50" fill="none" stroke="#1d1d1f" stroke-width="13"
+              stroke-dasharray="0 314" stroke-linecap="round"
+              transform="rotate(-90 68 68)"
+              style="transition:stroke-dasharray .9s cubic-bezier(.16,1,.3,1)"/>
           </svg>
           <div class="donut-center">
             <div class="donut-pct" id="donutPct">0%</div>
-            <div class="donut-pct-label">used</div>
+            <div class="donut-sub">used</div>
           </div>
         </div>
-        <div class="donut-legend">
-          <div class="legend-item">
-            <div class="legend-dot" style="background:#00e5c0"></div>
-            <div class="legend-text">
-              <span class="legend-label">Revenue Generated</span>
-              <span class="legend-val" id="leg-used">€0</span>
+        <div class="legend">
+          <div class="legend-row">
+            <div class="ldot" style="background:#1d1d1f"></div>
+            <div class="ltext">
+              <span class="ll">Revenue generated</span>
+              <span class="lv" id="leg-used">—</span>
             </div>
           </div>
-          <div class="legend-item">
-            <div class="legend-dot" style="background:#232838; border: 1px solid #3a4155"></div>
-            <div class="legend-text">
-              <span class="legend-label">Remaining Budget</span>
-              <span class="legend-val" id="leg-remaining">€0</span>
+          <div class="legend-row">
+            <div class="ldot" style="background:#d1d1d6"></div>
+            <div class="ltext">
+              <span class="ll">Remaining budget</span>
+              <span class="lv" id="leg-rem">—</span>
             </div>
           </div>
-          <div class="legend-item">
-            <div class="legend-dot" style="background:#3a4155"></div>
-            <div class="legend-text">
-              <span class="legend-label">My Allocated Budget</span>
-              <span class="legend-val" id="leg-planned">€0</span>
+          <div class="legend-row">
+            <div class="ldot" style="background:#f0f0f0;border:1px solid #e0e0e0"></div>
+            <div class="ltext">
+              <span class="ll">Allocated budget</span>
+              <span class="lv" id="leg-total">—</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- MONTHLY BARS -->
-    <div class="chart-card">
-      <div class="chart-title">Days per Month — Planned vs Actual</div>
-      <div class="bar-chart" id="barChart"></div>
+    <div class="card">
+      <div class="card-label">Days per Month</div>
+      <div class="bars" id="barChart"></div>
     </div>
-
   </div>
 
-  <!-- BOTTOM ROW -->
-  <div class="bottom-row fade-in stagger-4">
-
-    <!-- TABLE -->
-    <div class="chart-card">
-      <div class="chart-title">Monthly Breakdown</div>
-      <table class="breakdown-table">
+  <div class="bottom-row fu d4">
+    <div class="card">
+      <div class="card-label">Monthly Breakdown</div>
+      <table class="tbl">
         <thead>
           <tr>
             <th>Month</th>
-            <th>Planned days</th>
-            <th>Actual days</th>
+            <th>Planned</th>
+            <th>Actual</th>
             <th>Revenue</th>
           </tr>
         </thead>
-        <tbody id="breakdownBody"></tbody>
+        <tbody id="tableBody"></tbody>
       </table>
     </div>
 
-    <!-- BURN RATE CARD -->
-    <div class="burnrate-card">
-      <div class="chart-title" style="margin-bottom:0">Key Metrics</div>
-      <div class="burnrate-item">
-        <div class="burnrate-label">Rate</div>
-        <div class="burnrate-value">€235/hr</div>
+    <div class="metrics">
+      <div class="card-label" style="margin-bottom:.5rem">Key Metrics</div>
+      <div class="metric-item">
+        <div class="mlabel">Rate</div>
+        <div class="mval">€235 / hr</div>
+        <div class="msub">€235.125 Jan–Mar</div>
       </div>
-      <div class="divider"></div>
-      <div class="burnrate-item">
-        <div class="burnrate-label">Total Planned Days</div>
-        <div class="burnrate-value" id="metric-totalDays">0 days</div>
-        <div class="burnrate-sub" id="metric-totalHours">0 hours</div>
+      <div class="metric-item">
+        <div class="mlabel">Total Planned</div>
+        <div class="mval" id="m-total">—</div>
+        <div class="msub" id="m-hours">—</div>
       </div>
-      <div class="divider"></div>
-      <div class="burnrate-item">
-        <div class="burnrate-label">YTD Days Logged</div>
-        <div class="burnrate-value" id="metric-ytdDays">0 days</div>
-        <div class="burnrate-sub" id="metric-ytdPct">0% of planned</div>
+      <div class="metric-item">
+        <div class="mlabel">YTD Logged</div>
+        <div class="mval" id="m-ytd">—</div>
+        <div class="msub" id="m-ytdpct">—</div>
       </div>
-      <div class="divider"></div>
-      <div class="burnrate-item">
-        <div class="burnrate-label">Months remaining</div>
-        <div class="burnrate-value" id="metric-monthsLeft">—</div>
-        <div class="burnrate-sub" id="metric-daysLeft">— planned days left</div>
+      <div class="metric-item">
+        <div class="mlabel">Months Left</div>
+        <div class="mval" id="m-mleft">—</div>
+        <div class="msub" id="m-dleft">—</div>
       </div>
-      <div class="divider"></div>
-      <div class="burnrate-item">
-        <div class="burnrate-label">My Travel Budget</div>
-        <div class="burnrate-value">€22,500</div>
-        <div class="burnrate-sub">€2,500/month × 9 months</div>
+      <div class="metric-item">
+        <div class="mlabel">Travel Budget</div>
+        <div class="mval">€22,500</div>
+        <div class="msub">€2,500 / month × 9</div>
       </div>
     </div>
-
   </div>
 
-  <footer class="fade-in stagger-5">
-    <span>Source: PPS GWP · Siemens Energy · paul@dashboard</span>
-    <span id="lastUpdated">Last updated: —</span>
+  <footer class="fu d4">
+    <span>PPS GWP · Siemens Energy</span>
+    <span id="footerNote"></span>
   </footer>
 
 </div>
-
 <script>
-// ─── SUPABASE CONFIG ───────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://dqkiricdjabazpkkogoa.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxa2lyaWNkamFiYXpwa2tvZ29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDczNDIsImV4cCI6MjA5MDE4MzM0Mn0.3HYqqDD2Rfulsi9NM0OqcSB4VDquKd__QoSls367XLw';
-const RECORD_ID = 'paul';
+const RID = 'paul';
 
 async function dbGet() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_data?id=eq.${RECORD_ID}&select=actual_days`, {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_data?id=eq.${RID}&select=actual_days`, {
+    headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}
   });
-  const data = await res.json();
-  return (data && data[0]) ? data[0].actual_days : {};
+  const d = await r.json();
+  return (d && d[0]) ? d[0].actual_days : {};
 }
 
-async function dbSave(actualObj) {
-  await fetch(`${SUPABASE_URL}/rest/v1/dashboard_data?id=eq.${RECORD_ID}`, {
-    method: 'PATCH',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
+async function dbSave(obj) {
+  await fetch(`${SUPABASE_URL}/rest/v1/dashboard_data?id=eq.${RID}`, {
+    method:'PATCH',
+    headers:{
+      'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,
+      'Content-Type':'application/json','Prefer':'return=minimal'
     },
-    body: JSON.stringify({ actual_days: actualObj, updated_at: new Date().toISOString() })
+    body: JSON.stringify({actual_days:obj, updated_at: new Date().toISOString()})
   });
 }
 
-// ─── DATA ──────────────────────────────────────────────────────────────────
-const PAUL_RATE_EARLY = 235.125;
-const PAUL_RATE = 235;
-
+const RE = 235.125, R = 235;
 const MONTHS = [
-  { name: 'Jan', full: 'January 2026',   planned: 14.25, rate: PAUL_RATE_EARLY, revenue_planned: 26804.25 },
-  { name: 'Feb', full: 'February 2026',  planned: 17,    rate: PAUL_RATE_EARLY, revenue_planned: 31977 },
-  { name: 'Mar', full: 'March 2026',     planned: 20.75, rate: PAUL_RATE_EARLY, revenue_planned: 39030.75 },
-  { name: 'Apr', full: 'April 2026',     planned: 10,    rate: PAUL_RATE,       revenue_planned: 18810 },
-  { name: 'May', full: 'May 2026',       planned: 8,     rate: PAUL_RATE,       revenue_planned: 15048 },
-  { name: 'Jun', full: 'June 2026',      planned: 10,    rate: PAUL_RATE,       revenue_planned: 18800 },
-  { name: 'Jul', full: 'July 2026',      planned: 8,     rate: PAUL_RATE,       revenue_planned: 15040 },
-  { name: 'Aug', full: 'August 2026',    planned: 9,     rate: PAUL_RATE,       revenue_planned: 16920 },
-  { name: 'Sep', full: 'September 2026', planned: 9,     rate: PAUL_RATE,       revenue_planned: 16920 },
+  {n:'Jan',full:'January 2026',  p:14.25,r:RE,rp:26804.25},
+  {n:'Feb',full:'February 2026', p:17,   r:RE,rp:31977},
+  {n:'Mar',full:'March 2026',    p:20.75,r:RE,rp:39030.75},
+  {n:'Apr',full:'April 2026',    p:10,   r:R, rp:18810},
+  {n:'May',full:'May 2026',      p:8,    r:R, rp:15048},
+  {n:'Jun',full:'June 2026',     p:10,   r:R, rp:18800},
+  {n:'Jul',full:'July 2026',     p:8,    r:R, rp:15040},
+  {n:'Aug',full:'August 2026',   p:9,    r:R, rp:16920},
+  {n:'Sep',full:'September 2026',p:9,    r:R, rp:16920},
 ];
+const TDAYS = MONTHS.reduce((s,m)=>s+m.p,0);
+const TREV  = MONTHS.reduce((s,m)=>s+m.rp,0);
 
-const TOTAL_PLANNED_DAYS = MONTHS.reduce((s, m) => s + m.planned, 0);
-const TOTAL_PLANNED_REVENUE = MONTHS.reduce((s, m) => s + m.revenue_planned, 0);
-
-// actual[i] = days entered, null = not set
 let actual = new Array(9).fill(null);
 
-// ─── UI REFS ───────────────────────────────────────────────────────────────
-const daysInput = document.getElementById('daysInput');
-const monthSelect = document.getElementById('monthSelect');
-const monthBudgetInfo = document.getElementById('monthBudgetInfo');
-const statusEl = document.getElementById('lastUpdated');
+const daysEl   = document.getElementById('daysInput');
+const selEl    = document.getElementById('monthSelect');
+const hrsEl    = document.getElementById('hoursCalc');
+const mInfoEl  = document.getElementById('monthInfo');
+const statusEl = document.getElementById('statusText');
+const footerEl = document.getElementById('footerNote');
 
-function setStatus(msg, color) {
-  statusEl.textContent = msg;
-  statusEl.style.color = color || 'var(--dim)';
-}
+function fmt(n,d=0){ return Number(n).toLocaleString('nl-NL',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function ts(){ return new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); }
 
-// ─── EVENTS ────────────────────────────────────────────────────────────────
-monthSelect.addEventListener('change', () => {
-  const idx = parseInt(monthSelect.value);
-  const m = MONTHS[idx];
-  monthBudgetInfo.textContent = `Budget: ${m.planned} days planned · €${fmt(m.revenue_planned)}`;
-  daysInput.value = actual[idx] !== null ? actual[idx] : 0;
-  document.getElementById('hoursCalc').textContent = `= ${parseFloat(daysInput.value) * 8} hours`;
+selEl.addEventListener('change',()=>{
+  const i = +selEl.value, m = MONTHS[i];
+  mInfoEl.textContent = `${m.p} days planned · €${fmt(m.rp)}`;
+  daysEl.value = actual[i]!==null ? actual[i] : 0;
+  hrsEl.textContent = `= ${parseFloat(daysEl.value)*8} hours`;
 });
 
-daysInput.addEventListener('input', () => {
-  document.getElementById('hoursCalc').textContent = `= ${parseFloat(daysInput.value || 0) * 8} hours`;
+daysEl.addEventListener('input',()=>{
+  hrsEl.textContent = `= ${parseFloat(daysEl.value||0)*8} hours`;
 });
 
-async function updateDashboard() {
-  const idx = parseInt(monthSelect.value);
-  const days = parseFloat(daysInput.value) || 0;
-  actual[idx] = days;
-  renderAll();
-
-  // Save to Supabase
-  setStatus('Opslaan...', 'var(--accent3)');
+async function save(){
+  const i = +selEl.value;
+  actual[i] = parseFloat(daysEl.value)||0;
+  render();
+  statusEl.textContent = 'Saving…';
   try {
-    const obj = {};
-    actual.forEach((v, i) => { if (v !== null) obj[i] = v; });
+    const obj={};
+    actual.forEach((v,j)=>{ if(v!==null) obj[j]=v; });
     await dbSave(obj);
-    setStatus(`Opgeslagen om ${new Date().toLocaleTimeString('nl-NL')}`, 'var(--accent)');
+    statusEl.textContent = `Saved · ${ts()}`;
+    footerEl.textContent = '';
   } catch(e) {
-    setStatus('Fout bij opslaan — check console', 'var(--red)');
+    statusEl.textContent = 'Could not save';
     console.error(e);
   }
 }
 
-// ─── FORMAT ────────────────────────────────────────────────────────────────
-function fmt(n, decimals=0) {
-  return Number(n).toLocaleString('nl-NL', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-}
-
-// ─── RENDER ────────────────────────────────────────────────────────────────
-function renderAll() {
-  const currentIdx = parseInt(monthSelect.value);
-
-  let ytdDays = 0, ytdRevenue = 0;
-  for (let i = 0; i <= currentIdx; i++) {
-    const d = actual[i] !== null ? actual[i] : (i < currentIdx ? MONTHS[i].planned : 0);
-    ytdDays += d;
-    ytdRevenue += d * MONTHS[i].rate * 8;
+function render(){
+  const cur = +selEl.value;
+  let ytdD=0, ytdR=0;
+  for(let i=0;i<=cur;i++){
+    const d = actual[i]!==null ? actual[i] : (i<cur ? MONTHS[i].p : 0);
+    ytdD += d; ytdR += d * MONTHS[i].r * 8;
   }
 
-  // KPI cards
-  document.getElementById('kpi-budget').textContent = `€${fmt(TOTAL_PLANNED_REVENUE)}`;
-  document.getElementById('kpi-budget-days').textContent = `${fmt(TOTAL_PLANNED_DAYS, 2)} days planned`;
-  document.getElementById('kpi-ytd').textContent = `€${fmt(ytdRevenue)}`;
-  document.getElementById('kpi-ytd-days').textContent = `${fmt(ytdDays, 2)} days logged`;
-  document.getElementById('kpi-remaining').textContent = `€${fmt(TOTAL_PLANNED_REVENUE - ytdRevenue)}`;
-  document.getElementById('kpi-remaining-pct').textContent = `${fmt((1 - ytdRevenue/TOTAL_PLANNED_REVENUE)*100, 1)}% left`;
+  // KPI
+  document.getElementById('kpi-budget').textContent    = `€${fmt(TREV)}`;
+  document.getElementById('kpi-budget-sub').textContent= `${fmt(TDAYS,2)} days planned`;
+  document.getElementById('kpi-ytd').textContent       = `€${fmt(ytdR)}`;
+  document.getElementById('kpi-ytd-sub').textContent   = `${fmt(ytdD,2)} days logged`;
+  document.getElementById('kpi-rem').textContent       = `€${fmt(TREV-ytdR)}`;
+  document.getElementById('kpi-rem-sub').textContent   = `${fmt((1-ytdR/TREV)*100,1)}% left`;
+  const cd = actual[cur]!==null ? actual[cur] : 0;
+  document.getElementById('kpi-month').textContent     = `${cd} / ${MONTHS[cur].p}`;
+  document.getElementById('kpi-month-sub').textContent = `€${fmt(cd*MONTHS[cur].r*8)} revenue`;
 
-  const curDays = actual[currentIdx] !== null ? actual[currentIdx] : 0;
-  document.getElementById('kpi-month-days').textContent = `${curDays} / ${MONTHS[currentIdx].planned}`;
-  document.getElementById('kpi-month-rev').textContent = `€${fmt(curDays * MONTHS[currentIdx].rate * 8)} revenue`;
+  // Donut — r=50, circ=2π×50≈314.16
+  const circ = 2*Math.PI*50;
+  const pct  = Math.min(ytdR/TREV,1);
+  document.getElementById('donutArc').setAttribute('stroke-dasharray',`${pct*circ} ${circ}`);
+  document.getElementById('donutPct').textContent  = `${fmt(pct*100,1)}%`;
+  document.getElementById('leg-used').textContent  = `€${fmt(ytdR)}`;
+  document.getElementById('leg-rem').textContent   = `€${fmt(Math.max(0,TREV-ytdR))}`;
+  document.getElementById('leg-total').textContent = `€${fmt(TREV)}`;
 
-  // Donut
-  const circ = 2 * Math.PI * 56;
-  const usedPct = Math.min(ytdRevenue / TOTAL_PLANNED_REVENUE, 1);
-  document.getElementById('donutUsed').setAttribute('stroke-dasharray', `${usedPct * circ} ${circ}`);
-  document.getElementById('donutPct').textContent = `${fmt(usedPct * 100, 1)}%`;
-  document.getElementById('leg-used').textContent = `€${fmt(ytdRevenue)}`;
-  document.getElementById('leg-remaining').textContent = `€${fmt(Math.max(0, TOTAL_PLANNED_REVENUE - ytdRevenue))}`;
-  document.getElementById('leg-planned').textContent = `€${fmt(TOTAL_PLANNED_REVENUE)}`;
-
-  // Bar chart
-  const maxDays = Math.max(...MONTHS.map(m => m.planned));
-  const barHtml = MONTHS.map((m, i) => {
-    const act = actual[i] !== null ? actual[i] : (i < currentIdx ? m.planned : null);
-    const plannedPx = (m.planned / maxDays) * 100;
-    let barFill = '';
-    if (act !== null) {
-      const actPx = (act / maxDays) * 100;
-      const cls = i <= currentIdx ? 'actual' : 'future';
-      barFill = `<div class="bar-fill ${cls}" style="width:${actPx}%"></div>`;
-    } else {
-      barFill = `<div class="bar-fill future" style="width:${plannedPx}%"></div>`;
-    }
-    const isCurrent = i === currentIdx;
-    return `<div class="bar-row" style="opacity:${isCurrent ? 1 : 0.8}">
-      <span class="bar-month">${m.name}</span>
-      <div class="bar-track">${barFill}</div>
-      <span class="bar-val" style="color:${isCurrent ? 'var(--accent3)' : 'var(--muted)'}">${act !== null ? act : m.planned}d</span>
+  // Bars
+  const maxP = Math.max(...MONTHS.map(m=>m.p));
+  document.getElementById('barChart').innerHTML = MONTHS.map((m,i)=>{
+    const act = actual[i]!==null ? actual[i] : (i<cur ? m.p : null);
+    const isCur = i===cur;
+    const disp = act!==null ? act : m.p;
+    const pct2 = (disp/maxP)*100;
+    const cls  = i<cur ? 'done' : isCur ? 'active' : 'future';
+    return `<div class="bar-row" style="opacity:${i>cur?0.4:1}">
+      <span class="bm">${m.n}</span>
+      <div class="btrack"><div class="bfill ${cls}" style="width:${pct2}%"></div></div>
+      <span class="bval${isCur?' cur':''}">${disp}d</span>
     </div>`;
   }).join('');
-  document.getElementById('barChart').innerHTML = barHtml;
 
   // Table
-  let tableHtml = '';
-  let totalActDays = 0, totalActRev = 0;
-  MONTHS.forEach((m, i) => {
+  let html='', tD=0, tR=0;
+  MONTHS.forEach((m,i)=>{
     const act = actual[i];
-    const actDays = act !== null ? act : (i < currentIdx ? m.planned : null);
-    const rev = actDays !== null ? actDays * m.rate * 8 : null;
-    const isCur = i === currentIdx;
-    const daysDisplay = actDays !== null ? fmt(actDays, 2) : '—';
-    const revDisplay = rev !== null ? `€${fmt(rev)}` : `€${fmt(m.revenue_planned)}*`;
-    if (actDays !== null) { totalActDays += actDays; totalActRev += rev; }
-    tableHtml += `<tr>
-      <td class="month-name">${m.full}</td>
-      <td>${fmt(m.planned, 2)}</td>
-      <td style="color:${isCur ? 'var(--accent3)' : act !== null ? 'var(--accent)' : 'var(--muted)'}">${daysDisplay}</td>
-      <td>${revDisplay}</td>
+    const aD  = act!==null ? act : (i<cur ? m.p : null);
+    const rev = aD!==null ? aD*m.r*8 : null;
+    if(aD!==null){tD+=aD; tR+=rev;}
+    const isCur = i===cur;
+    const color = isCur ? '#0071e3' : act!==null ? '#1d1d1f' : '#aeaeb2';
+    const fw    = act!==null ? 500 : 400;
+    html += `<tr>
+      <td class="mname">${m.full}</td>
+      <td>${fmt(m.p,2)}</td>
+      <td style="color:${color};font-weight:${fw}">${aD!==null?fmt(aD,2):'—'}</td>
+      <td>${rev!==null?`€${fmt(rev)}`:`€${fmt(m.rp)}*`}</td>
     </tr>`;
   });
-  tableHtml += `<tr class="total-row">
-    <td>TOTAL</td>
-    <td>${fmt(TOTAL_PLANNED_DAYS, 2)}</td>
-    <td>${fmt(totalActDays, 2)}</td>
-    <td>€${fmt(totalActRev)}</td>
-  </tr>`;
-  document.getElementById('breakdownBody').innerHTML = tableHtml;
+  html += `<tr class="trow"><td>Total</td><td>${fmt(TDAYS,2)}</td><td>${fmt(tD,2)}</td><td>€${fmt(tR)}</td></tr>`;
+  document.getElementById('tableBody').innerHTML = html;
 
   // Metrics
-  document.getElementById('metric-totalDays').textContent = `${fmt(TOTAL_PLANNED_DAYS, 2)} days`;
-  document.getElementById('metric-totalHours').textContent = `${fmt(TOTAL_PLANNED_DAYS * 8)} hours`;
-  document.getElementById('metric-ytdDays').textContent = `${fmt(ytdDays, 2)} days`;
-  document.getElementById('metric-ytdPct').textContent = `${fmt(ytdDays/TOTAL_PLANNED_DAYS*100, 1)}% of total planned`;
-  const monthsLeft = 8 - currentIdx;
-  const plannedLeft = MONTHS.slice(currentIdx + 1).reduce((s, m) => s + m.planned, 0);
-  document.getElementById('metric-monthsLeft').textContent = `${monthsLeft} months`;
-  document.getElementById('metric-daysLeft').textContent = `${fmt(plannedLeft, 2)} days left`;
+  document.getElementById('m-total').textContent  = `${fmt(TDAYS,2)} days`;
+  document.getElementById('m-hours').textContent  = `${fmt(TDAYS*8)} hours total`;
+  document.getElementById('m-ytd').textContent    = `${fmt(ytdD,2)} days`;
+  document.getElementById('m-ytdpct').textContent = `${fmt(ytdD/TDAYS*100,1)}% of planned`;
+  const ml = 8-cur;
+  const dl = MONTHS.slice(cur+1).reduce((s,m)=>s+m.p,0);
+  document.getElementById('m-mleft').textContent = `${ml} months`;
+  document.getElementById('m-dleft').textContent = `${fmt(dl,2)} days ahead`;
 }
 
-// ─── BOOT: load from Supabase then render ──────────────────────────────────
-(async () => {
-  setStatus('Data laden...', 'var(--accent3)');
+(async()=>{
   try {
     const saved = await dbGet();
-    // Restore saved actuals
-    Object.entries(saved).forEach(([i, v]) => { actual[parseInt(i)] = v; });
-    // Sync input field to current month selection
-    const idx = parseInt(monthSelect.value);
-    daysInput.value = actual[idx] !== null ? actual[idx] : 0;
-    document.getElementById('hoursCalc').textContent = `= ${parseFloat(daysInput.value) * 8} hours`;
-    monthBudgetInfo.textContent = `Budget: ${MONTHS[idx].planned} days planned · €${fmt(MONTHS[idx].revenue_planned)}`;
-    renderAll();
-    setStatus(`Geladen om ${new Date().toLocaleTimeString('nl-NL')}`, 'var(--accent)');
+    Object.entries(saved).forEach(([i,v])=>{ actual[+i]=v; });
+    const idx = +selEl.value;
+    daysEl.value = actual[idx]!==null ? actual[idx] : 0;
+    hrsEl.textContent = `= ${parseFloat(daysEl.value)*8} hours`;
+    mInfoEl.textContent = `${MONTHS[idx].p} days planned · €${fmt(MONTHS[idx].rp)}`;
+    render();
+    statusEl.textContent = `Updated · ${ts()}`;
   } catch(e) {
-    // Fallback: render with empty data
-    renderAll();
-    setStatus('Offline — data niet geladen', 'var(--red)');
+    render();
+    statusEl.textContent = 'Offline';
     console.error(e);
   }
 })();
